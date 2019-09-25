@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<bean id="second" class="a.Second1"></bean>
+	<bean id="first-set" class="a.First"><!-- First first = new First(); -->
+		<property name="num" value="77"></property><!-- first.setNum(99); //값 주입 -->
+		<!-- <property name="num">
+			<value>77</value>
+		</property> -->
+		<property name="second" ref="second"></property><!-- first.setSecond(second); -->
+		<!-- <property name="second">
+			<ref bean="second"/>
+		</property> -->
+	</bean>
+	<bean id="first-con" class="a.First"><!-- First first = new First(); -->
+		<!-- 매개변수가 총 4개인 생성자에 매개변수 주입 -->
+		<constructor-arg name="num" value="88"/>
+		<constructor-arg name="flag" value="true"/>
+		<constructor-arg name="msg" value="hello"/>
+		<constructor-arg name="second" ref="second"/> <!-- 이미 만들어져있는 second 객체 사용: ref -->
+	</bean>
+	<bean id="first-list" class="a.First">
+		<property name="list">
+			<list value-type="java.lang.String">
+				<value>서울시</value>
+				<value>경기도</value>
+				<value>제주시</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="first-map" class="a.First">
+		<property name="map">
+			<map value-type="java.lang.String">
+				<entry key="1" value="ONE"/>
+				<entry key="2" value="TWO"/>
+				<entry key="3" value="THREE"/>
+			</map>
+		</property>
+	</bean>
+</beans>

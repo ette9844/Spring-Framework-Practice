@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.vo.Product">
+
+	<!-- has-a 관계설정 -->
+	<resultMap id="ProductResultMap" type="com.my.vo.Product">
+    <id property="prod_no" column="prod_no"/>
+    <result property="prod_name" column="prod_name"/>
+    <result property="prod_price" column="prod_price"/>
+    <result property="prod_detail" column="prod_detail"/>
+    <!-- 자바 클래스간의 HAS-A 관계를 표현하는 방식:association -->
+    <association property="category" javaType="com.my.vo.Category">
+      <id property="cate_no" column="cate_no"/>
+      <result property="cate_name" column="cate_name"/>
+    </association>
+  </resultMap>
+<select id = "selectAll" parameterType = "string" resultMap="ProductResultMap">
+   	SELECT c.cate_name, p.prod_no, p.prod_name, p.prod_price
+   	FROM category c JOIN product p ON c.cate_no = p.prod_cate_no
+   	ORDER BY c.cate_no
+</select>
+<select id = "selectByNo" parameterType = "string" resultMap="ProductResultMap">
+   	SELECT c.cate_name, p.prod_no, p.prod_name, p.prod_price, p.prod_detail
+   	FROM category c JOIN product p ON c.cate_no = p.prod_cate_no
+   	WHERE p.prod_no = #{prod_no}
+</select>
+
+</mapper>

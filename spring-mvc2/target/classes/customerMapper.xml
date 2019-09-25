@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.vo.Customer"><!-- mapper 파일 식별자 -->
+  <resultMap id="customerResultMap" type="Customer">
+    <id property="id" column="id" />
+    <result property="name" column="name"/>
+    <!-- 자바 클래스간의 HAS-A 관계를 표현하는 방식:association -->
+    <association property="post" javaType="Post">
+      <id property="buildingno" column="buildingno"/>
+      <result property="zipcode" column="zipcode"/>
+    </association>
+  </resultMap>
+  <update id="updateName" parameterType="java.lang.String">
+    UPDATE customer SET name=#{name} WHERE id=#{id}
+  </update>
+  <insert id="insert" parameterType="Customer">
+    INSERT INTO customer(id, pwd, name, addr)
+    VALUES( #{id}, #{pwd}, #{name}, #{addr} )
+  </insert>
+  <delete id="delete" parameterType="string">
+    DELETE customer WHERE id=#{id}
+  </delete>
+  <select id="selectById" parameterType="string" 
+  						  resultType="Customer">
+    SELECT * FROM customer WHERE id=#{id}
+  </select>
+  <select id="selectCount" resultType="int">
+    SELECT COUNT(*) FROM customer
+  </select>
+  <select id="selectGroup" resultType="map">
+    SELECT COUNT(*) C1, COUNT(*)/2 C2 
+    FROM customer
+  </select>
+  <select id="selectAll" resultType="Customer">
+    SELECT * FROM customer
+  </select>
+  <select id="selectZipcodeById" parameterType="string" 
+          resultType="Customer" resultMap="customerResultMap">
+    SELECT id, c.buildingno, name, zipcode
+    FROM customer c JOIN post p
+    ON c.buildingno = p.buildingno
+    WHERE id = #{id}
+  </select>
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	<context:annotation-config />
+	<!-- 비즈니스로직용 -->
+	<context:component-scan
+		base-package="com.my.service" />
+	<context:component-scan
+		base-package="com.my.dao" />
+	<!-- 비즈니스로직용 -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"
+			value="oracle.jdbc.driver.OracleDriver">
+		</property>
+		<property name="url"
+			value="jdbc:oracle:thin:@localhost:1521:xe">
+		</property>
+		<property name="username" value="hyejin"></property>
+		<property name="password" value="wow130"></property>
+	</bean>
+	<!-- 비즈니스로직용 -->
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="configLocation"
+			value="classpath:mybatis-config.xml" />
+	</bean>
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="classpath:message"></property>
+	</bean>
+	<!-- sqlSession을 생성자bean을 이용하여 미리 가져오기 -->
+	<!-- 같은 connection을 써야 같은 트랜잭션으로 처리됨 -->
+	<!-- spring으로 관리되기 때문에 같은 connection을 사용할 수 있게된다. -->
+
+	<!-- @Transactional annotation 사용하는 방법 -->
+	<!-- <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate"> 
+		<constructor-arg index="0" ref="sqlSessionFactory"/> </bean> 선언적 트랜잭션 설정 
+		<aop:aspectj-autoproxy></aop:aspectj-autoproxy> 대리자 설정 <bean id="transactionManager" 
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"> 
+		<property name="dataSource" ref="dataSource"/> </bean> -->
+
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="sqlSession"
+		class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory"
+			ref="sqlSessionFactory" />
+	</bean>
+
+	<!-- aop:config = aop 설정 태그 -->
+	<aop:config>
+		<!-- AOPController를 갖고 있는 모든 메서드에 대하여 : aspectj표현식-->
+		<aop:advisor
+			pointcut="execution(public void com.my.dao.OrderDAO.*(..))"
+			advice-ref="txAdvice" />
+<!-- 			pointcut="execution(public void com.my.dao.AccountDAO.*(..))" -->
+	</aop:config>
+	<!-- 각 메서드들에 대한 트랜잭션 전파 방식 설정 -->
+	<tx:advice id="txAdvice"
+		transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- <tx:method name="account" propagation="REQUIRED" /> -->
+			<tx:method name="insert" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+</beans>

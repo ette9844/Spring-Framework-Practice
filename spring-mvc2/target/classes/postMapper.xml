@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.vo.Post">
+  <resultMap id="postResultMap" type="java.util.HashMap">
+    <id property="buildingno" column="buildingno"/>
+    <result property="zipcode" column="zipcode"/>
+    <result property="addr1" column="addr1"/>
+    <result property="addr2" column="addr2"/>
+  </resultMap>
+  <select id="selectByDoro" parameterType="string" resultMap="postResultMap">
+   SELECT buildingno, zipcode, 
+          sido|| ' ' 
+          || sigungu || NVL2(sigungu,' ', '')
+          || eupmyun || NVL2(eupmyun,' ', '')
+          || doro ||' ' 
+          || building1
+          || DECODE(building2,'0', '', '-'||building2) ||' '
+          || '('|| dong || ri || DECODE(building, '', '', ',' ||building) ||')'
+          AS addr1, 
+          sido ||' ' 
+          || sigungu ||NVL2(sigungu,' ', '')
+          || eupmyun ||NVL2(eupmyun,' ', '')
+          || dong || ri ||' ' 
+          || zibun1 || DECODE(zibun2, '0', '',  '-'|| zibun2)
+          || DECODE(building, '', '', ' (' ||building ||')') 
+          AS addr2 
+    FROM post 
+    WHERE (doro || ' ' || building1 || DECODE(building2,'0', '', '-'||building2)) 
+    LIKE '%${value}%'
+  </select>
+</mapper>

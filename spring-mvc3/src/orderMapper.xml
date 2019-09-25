@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.vo.Order">
+  <resultMap id="orderResultMap" type="OrderInfo" autoMapping="true">
+    <id property="order_no" column="order_no"/>
+    <collection property="orderDetails" ofType="OrderDetail" autoMapping="true">
+      <!-- <id property="order_no" column="order_no"/> -->
+      <association property="product" javaType="Product" autoMapping="true">
+        <result property="prod_no" column="order_prod_no"/>
+      </association>
+    </collection>
+  </resultMap>
+  <select id="selectById" parameterType="string" resultMap="orderResultMap">
+    SELECT info.order_no, info.order_time, 
+			   detail.order_prod_no, detail.order_quantity, 
+			   p.prod_name, p.prod_price
+ 	FROM order_info info 
+ 	JOIN order_detail detail ON info.order_no = detail.order_no
+	JOIN product p ON p.prod_no = detail.order_prod_no
+	WHERE order_id=#{id}
+	ORDER BY order_time DESC
+  </select>
+  <!-- 주문기본 -->
+  <insert id="insertOrderInfo" parameterType="string">
+    INSERT INTO order_info(order_no, order_id, order_time)
+    VALUES (order_seq.NEXTVAL, #{order_id}, SYSTIMESTAMP)
+  </insert>
+  <!-- 주문상세 -->
+  <insert id="insertOrderDetail" parameterType="OrderDetail">
+    INSERT INTO order_detail(order_no, order_prod_no, order_quantity)
+    VALUES (order_seq.CURRVAL, #{product.prod_no}, #{order_quantity})
+  </insert>
+</mapper>
